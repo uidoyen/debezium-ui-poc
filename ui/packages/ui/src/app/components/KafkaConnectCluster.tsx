@@ -1,9 +1,8 @@
 import { Services } from "@debezium/ui-services";
-import { Brand, Form, PageHeader } from '@patternfly/react-core';
+import { Form } from '@patternfly/react-core';
 import * as React from 'react';
-import { useHistory } from "react-router-dom";
+import { AppLayoutContext } from 'src/app/Layout/AppLayoutContext';
 import { fetch_retry } from "src/app/shared";
-import BrandLogo from '../../../assets/images/debezium_logo_300px.png';
 import { BasicSelectInput } from '../components';
 
 export const KafkaConnectCluster: React.FC = () => {
@@ -15,10 +14,8 @@ export const KafkaConnectCluster: React.FC = () => {
 	const [apiError, setApiError] = React.useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = React.useState<Error>(new Error());
 	
-	const history = useHistory();
-	const homeClick = () =>{
-		history.push("/")
-	}
+  const appLayoutContext = React.useContext(AppLayoutContext);
+  console.log(appLayoutContext)
 
 	React.useEffect(() => {
     const globalsService = Services.getGlobalsService();
@@ -31,35 +28,24 @@ export const KafkaConnectCluster: React.FC = () => {
         setApiError(true);
         setErrorMsg(err);
       });
-	}, [setConnectClusters]);
+  }, [setConnectClusters]);
+  
 	const onChange = (value: string, event: any) => {
     setConnectCluster(value);
 	};
 	
-	const headerTools = (
-		<>
-			<div>
-				<Form>
-					<BasicSelectInput 
-						options={connectClusters} 
-						label="Kafka connect cluster"
-						fieldId="kafka-connect-cluster"
-						propertyChange={onChange}
-					/>
-				</Form>
-			</div>
-			<div>
-				hello
-			</div>
-		</>
-	);
-	
     return (
-		<PageHeader 
-			logo={<Brand onClick={homeClick} 
-			className="brandLogo" 
-			src={BrandLogo} alt="Debezium" />} 
-			headerTools={headerTools} 
-		/>
+      <div className="kafka-connect">
+        <div className="kafka-connect__cluster">
+          <Form>
+            <BasicSelectInput 
+              options={connectClusters} 
+              label="Kafka connect cluster"
+              fieldId="kafka-connect-cluster"
+              propertyChange={onChange}
+            />
+        </Form>
+      </div>
+    </div>
     );
 }

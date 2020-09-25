@@ -119,7 +119,7 @@ export const CreateConnectorPage: React.FunctionComponent = () => {
   const [connectorCreateFailed, setConnectorCreateFailed] = React.useState<
     boolean
   >(false);
-
+  
   const history = useHistory();
   const location = useLocation();
   const connectionPropsRef = React.useRef();
