@@ -12,6 +12,7 @@ import {
   Title
 } from "@patternfly/react-core";
 import { CubesIcon } from "@patternfly/react-icons";
+import { Table, TableBody, TableHeader } from "@patternfly/react-table";
 import React from "react";
 import { PageLoader } from "src/app/components";
 import { ApiError, fetch_retry } from "src/app/shared";
@@ -53,7 +54,6 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
     props.createConnectorCallback(connectorNames, props.clusterId);
   }
 
-
   const getConnectorsList = () =>{
     const connectorService = Services.getConnectorService();
     fetch_retry(connectorService.getConnectors, connectorService, [
@@ -67,13 +67,20 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
         setApiError(true);
         setErrorMsg(err);
       });
-    }
+  }
 
-    React.useEffect(() => {
-      const getConnectorsInterval = setInterval(() => getConnectorsList(), 10000);
-      return () => clearInterval(getConnectorsInterval);;
-    },[]);
+  React.useEffect(() => {
+    const getConnectorsInterval = setInterval(() => getConnectorsList(), 10000);
+    return () => clearInterval(getConnectorsInterval);;
+  },[]);
 
+  const columns = ['', 'Name', 'Status', 'Tasks', ''];
+  const rows = [
+    ['', 'Connector1', 'StatusA', 'TasksA', 'Actions'],
+    ['', 'Connector2', 'StatusB', 'TasksB', 'Actions'],
+    ['', 'Connector3', 'StatusC', 'TasksC', 'Actions']
+  ];
+  
   return (
     <WithLoader
       error={apiError}
@@ -87,7 +94,11 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
             <>
               <Flex className="connectors-page_toolbarFlex">
                 <FlexItem>
-                  {props.title ? <Title headingLevel={"h1"}>Connectors</Title> : ""}
+                  {props.title ? (
+                    <Title headingLevel={"h1"}>Connectors</Title>
+                  ) : (
+                    ""
+                  )}
                 </FlexItem>
                 <FlexItem>
                   <Button
@@ -99,7 +110,14 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
                   </Button>
                 </FlexItem>
               </Flex>
-              <DataList aria-label={"connector list"} className="connectors-page_dataList">
+              <Table aria-label="Connector Table" cells={columns} rows={rows}>
+                <TableHeader />
+                <TableBody />
+              </Table>
+              <DataList
+                aria-label={"connector list"}
+                className="connectors-page_dataList"
+              >
                 {getSortedConnectors(connectors).map((conn, index) => {
                   return (
                     <ConnectorListItem
