@@ -26,7 +26,14 @@
         @media screen and (max-width: 480px) {
           min-width: 200px;
         }
+        &-control{
+          border: 1px solid var(--pf-global--BackgroundColor--dark-200);
+          padding: 0 0 0 10px;
+        }
       }
+    }
+    .pf-c-select__toggle-wrapper{
+      font-size: 0.77rem;
     }
   }
 }

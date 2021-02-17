@@ -1,12 +1,11 @@
 :root {
   --myApp-global--spacer--md: 30px;
 }
-body{
-  font-size: var(--pf-global--FontSize--lg);
-}
+
 *:focus{
   outline: none;
 }
+
 .app-container {
   display: flex;
   align-items: center;
@@ -21,18 +20,17 @@ body{
 .app-page {
   height: 100vh;
   background-color: white;
-}
-
-.app-page-section-border-bottom {
-  border-bottom: 1px solid var(--pf-global--BorderColor--100);
-}
-
-.app-page-section-breadcrumb {
-  padding: 12px 12px 24px;
-}
-
-.app-page-section-height {
-  height: 100vh;
+  &-section{
+    &-height {
+      height: 100vh;
+    }
+    &-border-bottom{
+      border-bottom: 1px solid var(--pf-global--BorderColor--100);
+    }
+    &-breadcrumb {
+      padding: 12px 12px 24px;
+    }
+  }
 }
 
 .pf-m-selected {
@@ -58,4 +56,7 @@ body{
 .app-drawer-drawer {
   display: flex;
   flex-direction: row;
+}
+.pf-c-form-control[aria-invalid="true"]{
+  background-image: none!important;
 }

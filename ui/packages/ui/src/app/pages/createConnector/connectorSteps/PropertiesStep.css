@@ -30,7 +30,7 @@
       width: 100%;
 
       &-text {
-        font-size: var(--pf-global--FontSize--xl);
+        font-size: var(--pf-global--FontSize--md);
         font-weight: var(--pf-global--FontWeight--bold);
         color: var(--pf-global--Color--100);
       }
