@@ -1,0 +1,15 @@
+name: Test Debezium UI Frontend
+
+on:
+  push:
+    branches:
+      - testCI
+    paths:
+      - 'ui/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Debezium UI
+        uses: actions/checkout@v2
