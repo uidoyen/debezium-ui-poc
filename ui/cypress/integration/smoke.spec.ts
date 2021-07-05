@@ -5,7 +5,7 @@ context('I am on the debezium-ui homepage', () => {
     cy.visit('/')
   })
   it('the header appears', () => {
-    cy.get('.pf-c-page__header').find('img').should('have.attr', 'src').should('include','debezium_logo_300px')
+    cy.get('.pf-c-page__header', { timeout: 50000 }).find('img').should('have.attr', 'src').should('include','debezium_logo_300px')
   })
   it('Check if able to connect backend and get connectors', () => {
     cy.intercept('/api/connectors/1').as('getConnector')
