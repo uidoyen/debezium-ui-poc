@@ -38,5 +38,7 @@ jobs:
         uses: bahmutov/npm-install@v1
         with:
           working-directory: ./ui
+      - name: Build Packages
+        run: yarn run build
       - name: Test Debezium UI Frontend
         run: yarn run unit:test

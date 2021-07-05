@@ -1,4 +1,4 @@
-import { ConnectorProperty, ConnectorType } from "@debezium/ui-models";
+import { ConnectorProperty, ConnectorType } from '@debezium/ui-models'
 
 export enum ConnectorState {
   UNASSIGNED = "UNASSIGNED",
