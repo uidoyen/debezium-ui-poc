@@ -20,11 +20,6 @@
     "unit:test": "lerna run test",
     "i18n": "lerna run i18n --scope=@debezium/ui"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn build"
-    }
-  },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.7",
