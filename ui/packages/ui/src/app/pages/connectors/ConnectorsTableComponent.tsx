@@ -1,5 +1,3 @@
-import { Connector } from "@debezium/ui-models";
-import { Services } from "@debezium/ui-services";
 import {
   Button,
   Dropdown,
@@ -16,26 +14,42 @@ import {
   Title,
   Toolbar,
   ToolbarContent,
-  ToolbarItem,
-} from "@patternfly/react-core";
-import { CubesIcon, FilterIcon, SortAmountDownAltIcon, SortAmountDownIcon } from "@patternfly/react-icons";
-import { cellWidth, expandable, IAction, IExtraData, IRowData, Table, TableBody, TableHeader } from "@patternfly/react-table";
-import React, { SyntheticEvent } from "react";
-import isEqual from "react-fast-compare";
+  ToolbarItem
+} from '@patternfly/react-core';
+import { CubesIcon, FilterIcon, SortAmountDownAltIcon, SortAmountDownIcon } from '@patternfly/react-icons';
+import {
+  cellWidth,
+  expandable,
+  IAction,
+  IExtraData,
+  IRowData,
+  Table,
+  TableBody,
+  TableHeader
+} from '@patternfly/react-table';
+import { Services } from '@debezium/ui-services';
+import { Connector } from '@debezium/ui-models';
+import React, { SyntheticEvent } from 'react';
+import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
-import { PageLoader, ToastAlertComponent, ConnectorIcon } from "components";
-import { AppLayoutContext } from "layout";
-import { ApiError, ConfirmationButtonStyle, ConfirmationDialog, ConfirmationType, ConnectorTypeId, fetch_retry, WithLoader } from "shared";
-import { ConnectorOverview } from "./ConnectorOverview";
-import "./ConnectorsTableComponent.css";
-import { ConnectorStatus } from "./ConnectorStatus";
-import { ConnectorTask } from "./ConnectorTask";
-import { ConnectorTaskState } from "./ConnectorTaskState";
+import { PageLoader, ToastAlertComponent, ConnectorIcon } from 'components';
+import { AppLayoutContext } from 'layout';
+import {
+  ApiError,
+  ConfirmationButtonStyle,
+  ConfirmationDialog,
+  ConfirmationType,
+  ConnectorTypeId,
+  fetch_retry,
+  WithLoader
+} from 'shared';
+import { ConnectorOverview } from './ConnectorOverview';
+import './ConnectorsTableComponent.css';
+import { ConnectorStatus } from './ConnectorStatus';
+import { ConnectorTask } from './ConnectorTask';
+import { ConnectorTaskState } from './ConnectorTaskState';
 
-type ICreateConnectorCallbackFn = (
-  connectorNames: string[],
-  clusterId: number
-) => void;
+type ICreateConnectorCallbackFn = (connectorNames: string[], clusterId: number) => void;
 
 interface IConnectorsTableComponentProps {
   clusterId: number;
@@ -49,16 +63,14 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
   props: IConnectorsTableComponentProps
 ) => {
   const enum Action {
-    DELETE = "DELETE",
-    PAUSE = "PAUSE",
-    RESUME = "RESUME",
-    RESTART = "RESTART",
-    RESTART_TASK = "RESTART_TASK",
-    NONE = "NONE",
+    DELETE = 'DELETE',
+    PAUSE = 'PAUSE',
+    RESUME = 'RESUME',
+    RESTART = 'RESTART',
+    RESTART_TASK = 'RESTART_TASK',
+    NONE = 'NONE'
   }
-  const [connectors, setConnectors] = React.useState<Connector[]>(
-    [] as Connector[]
-  );
+  const [connectors, setConnectors] = React.useState<Connector[]>([] as Connector[]);
   const [tableRows, setTableRows] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [apiError, setApiError] = React.useState<boolean>(false);
@@ -66,15 +78,13 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
 
   const appLayoutContext = React.useContext(AppLayoutContext);
   const [currentAction, setCurrentAction] = React.useState(Action.NONE);
-  const [currentActionConnector, setCurrentActionConnector] = React.useState(
-    ""
-  );
+  const [currentActionConnector, setCurrentActionConnector] = React.useState('');
 
   const [alerts, setAlerts] = React.useState<any[]>([]);
   const [connectorTaskToRestart, setConnectorTaskToRestart] = React.useState<any[]>([]);
-  
+
   const { t } = useTranslation();
-  const [isSortingDropdownOpen, setIsSortingDropdownOpen] = React.useState(false)
+  const [isSortingDropdownOpen, setIsSortingDropdownOpen] = React.useState(false);
   const [currentCategory, setCurrentCategory] = React.useState<string>('Name');
   const [desRowOrder, setDesRowOrder] = React.useState<boolean>(false);
 
@@ -87,19 +97,19 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
       title: heading,
       variant: type,
       key: uId,
-      message: msg ? msg : "",
+      message: msg ? msg : ''
     };
     alertsCopy.push(newAlert);
     setAlerts(alertsCopy);
   };
 
   const removeAlert = (key: string) => {
-    setAlerts([...alerts.filter((el) => el.key !== key)]);
+    setAlerts([...alerts.filter(el => el.key !== key)]);
   };
 
   const resetCurrentAction = () => {
     setCurrentAction(Action.NONE);
-    setCurrentActionConnector("");
+    setCurrentActionConnector('');
   };
 
   const setCurrentActionAndName = (action: Action, connName: string) => {
@@ -114,57 +124,57 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
     switch (currentAction) {
       case Action.DELETE:
         connectorService
-        .deleteConnector(appLayoutContext.clusterId, connName)
-        .then((cConnectors: any) => {
-          addAlert("success", t('connectorDeletedSuccess'));
-        })
-        .catch((err) => {
-          addAlert("danger",t('connectorDeletionFailed'), err?.message);
-        });
+          .deleteConnector(appLayoutContext.clusterId, connName)
+          .then((cConnectors: any) => {
+            addAlert('success', t('connectorDeletedSuccess'));
+          })
+          .catch(err => {
+            addAlert('danger', t('connectorDeletionFailed'), err?.message);
+          });
         break;
       case Action.PAUSE:
         connectorService
-        .pauseConnector(appLayoutContext.clusterId, connName, {})
-        .then((cConnectors: any) => {
-          addAlert("success", t('connectorPausedSuccess'));
-          setConnectorStatus(connName, "PAUSED");
-        })
-        .catch((err) => {
-          addAlert("danger",t('connectorPauseFailed'), err?.message);
-        });    
+          .pauseConnector(appLayoutContext.clusterId, connName, {})
+          .then((cConnectors: any) => {
+            addAlert('success', t('connectorPausedSuccess'));
+            setConnectorStatus(connName, 'PAUSED');
+          })
+          .catch(err => {
+            addAlert('danger', t('connectorPauseFailed'), err?.message);
+          });
         break;
       case Action.RESUME:
         connectorService
-        .resumeConnector(appLayoutContext.clusterId, connName, {})
-        .then((cConnectors: any) => {
-          addAlert("success", t('connectorResumedSuccess'));
-          setConnectorStatus(connName, "RUNNING");
-        })
-        .catch((err) => {
-          addAlert("danger",t('connectorResumeFailed'), err?.message);
-        });    
+          .resumeConnector(appLayoutContext.clusterId, connName, {})
+          .then((cConnectors: any) => {
+            addAlert('success', t('connectorResumedSuccess'));
+            setConnectorStatus(connName, 'RUNNING');
+          })
+          .catch(err => {
+            addAlert('danger', t('connectorResumeFailed'), err?.message);
+          });
         break;
       case Action.RESTART:
         connectorService
-        .restartConnector(appLayoutContext.clusterId, connName, {})
-        .then((cConnectors: any) => {
-          addAlert("success", t('connectorRestartSuccess'));
-          setConnectorStatus(connName, "RUNNING");
-        })
-        .catch((err) => {
-          addAlert("danger",t('connectorRestartFailed'), err?.message);
-        });
+          .restartConnector(appLayoutContext.clusterId, connName, {})
+          .then((cConnectors: any) => {
+            addAlert('success', t('connectorRestartSuccess'));
+            setConnectorStatus(connName, 'RUNNING');
+          })
+          .catch(err => {
+            addAlert('danger', t('connectorRestartFailed'), err?.message);
+          });
         break;
       case Action.RESTART_TASK:
         const [connectorName, connectorTaskId] = connectorTaskToRestart;
         connectorService
-        .restartConnectorTask(appLayoutContext.clusterId, connectorName, connectorTaskId, {})
-        .then((cConnectors: any) => {
-          addAlert("success", t('connectorTaskRestartSuccess'));
-        })
-        .catch((err) => {
-          addAlert("danger",t('connectorTaskRestartFailed'), err?.message);
-        });
+          .restartConnectorTask(appLayoutContext.clusterId, connectorName, connectorTaskId, {})
+          .then((cConnectors: any) => {
+            addAlert('success', t('connectorTaskRestartSuccess'));
+          })
+          .catch(err => {
+            addAlert('danger', t('connectorTaskRestartFailed'), err?.message);
+          });
         break;
       default:
         break;
@@ -172,7 +182,7 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
   };
 
   const createConnector = () => {
-    const connectorNames = connectors.map((conn) => {
+    const connectorNames = connectors.map(conn => {
       return conn.name;
     });
     props.createConnectorCallback(connectorNames, props.clusterId);
@@ -191,9 +201,7 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
 
   const getConnectorsList = () => {
     const connectorService = Services.getConnectorService();
-    fetch_retry(connectorService.getConnectors, connectorService, [
-      props.clusterId,
-    ])
+    fetch_retry(connectorService.getConnectors, connectorService, [props.clusterId])
       .then((cConnectors: Connector[]) => {
         setLoading(false);
         setConnectors(cConnectors.filter(c => c !== null));
@@ -224,11 +232,11 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
           connName={conn.name}
           taskId={id}
           errors={taskState.errors}
-          i18nTask={t("task")}
-          i18nRestart={t("restart")}
-          i18nTaskStatusDetail={t("taskStatusDetail")}
-          i18nTaskErrorTitle={t("taskErrorTitle")}
-          i18nMoreInformation={t("moreInformation")}
+          i18nTask={t('task')}
+          i18nRestart={t('restart')}
+          i18nTaskStatusDetail={t('taskStatusDetail')}
+          i18nTaskErrorTitle={t('taskErrorTitle')}
+          i18nMoreInformation={t('moreInformation')}
           connectorTaskToRestart={taskToRestart}
           showConnectorTaskToRestartDialog={showConnectorTaskToRestartDialog}
         />
@@ -242,10 +250,7 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
    * @param connName the connector
    * @param status the new status
    */
-  const setConnectorStatus = (
-    connName: string,
-    status: "PAUSED" | "RUNNING"
-  ) => {
+  const setConnectorStatus = (connName: string, status: 'PAUSED' | 'RUNNING') => {
     const updatedRows = [...connectors];
     let doUpdateTable = false;
     for (const conn of updatedRows) {
@@ -261,11 +266,7 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
   };
 
   React.useEffect(() => {
-    const timeout = setTimeout(
-      removeAlert,
-      10 * 1000,
-      alerts[alerts.length - 1]?.key
-    );
+    const timeout = setTimeout(removeAlert, 10 * 1000, alerts[alerts.length - 1]?.key);
     return () => clearTimeout(timeout);
   }, [alerts]);
 
@@ -276,62 +277,48 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
 
   const columns = [
     {
-      title: "",
+      title: '',
       columnTransforms: [cellWidth(10)],
-      cellFormatters: [expandable],
+      cellFormatters: [expandable]
     },
     {
-      title: t("name"),
-      columnTransforms: [cellWidth(40)],
+      title: t('name'),
+      columnTransforms: [cellWidth(40)]
     },
     {
-      title: t("status"),
-      columnTransforms: [cellWidth(20)],
+      title: t('status'),
+      columnTransforms: [cellWidth(20)]
     },
     {
-      title: t("tasks"),
-      columnTransforms: [cellWidth(30)],
-    },
+      title: t('tasks'),
+      columnTransforms: [cellWidth(30)]
+    }
   ];
 
-  const sortFieldsItem = [
-    { title: t("name"), isPlaceholder: true },
-    { title: t("status") },
-    { title: t("tasks") },
-  ];
+  const sortFieldsItem = [{ title: t('name'), isPlaceholder: true }, { title: t('status') }, { title: t('tasks') }];
 
-  const updateTableRows = (
-    conns: Connector[],
-    isReverse: boolean,
-    sortBy: string = currentCategory
-  ) => {
+  const updateTableRows = (conns: Connector[], isReverse: boolean, sortBy: string = currentCategory) => {
     let sortedConns: Connector[] = [];
 
     switch (sortBy) {
-      case t("status"):
+      case t('status'):
         // Sort connectors by name for the table
         sortedConns = conns.sort((thisConn, thatConn) => {
           return thisConn.name.localeCompare(thatConn.name);
         });
         // Sort connectors by status for the table
         sortedConns = conns.sort((thisConn, thatConn) => {
-          return thisConn.connectorStatus.localeCompare(
-            thatConn.connectorStatus
-          );
+          return thisConn.connectorStatus.localeCompare(thatConn.connectorStatus);
         });
         break;
-      case t("tasks"):
+      case t('tasks'):
         // Sort connectors by name for the table
         sortedConns = conns.sort((thisConn, thatConn) => {
           return thisConn.name.localeCompare(thatConn.name);
         });
         // Sort connectors by tasks for the table
         sortedConns = conns.sort((thisConn, thatConn) => {
-          return thisConn.taskStates[0].taskStatus.localeCompare(
-            thatConn.taskStates[0].taskStatus
-          )
-            ? -1
-            : 1;
+          return thisConn.taskStates[0].taskStatus.localeCompare(thatConn.taskStates[0].taskStatus) ? -1 : 1;
         });
         break;
       default:
@@ -354,71 +341,65 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
           {
             title: (
               <ConnectorIcon
-                connectorType={
-                  conn.connectorType === "PostgreSQL"
-                    ? ConnectorTypeId.POSTGRES
-                    : conn.connectorType
-                }
+                connectorType={conn.connectorType === 'PostgreSQL' ? ConnectorTypeId.POSTGRES : conn.connectorType}
                 alt={conn.name}
                 width={40}
                 height={40}
               />
-            ),
+            )
           },
 
           {
-            title: <b data-testid={"connector-name"}>{conn.name}</b>,
+            title: <b data-testid={'connector-name'}>{conn.name}</b>
           },
           {
-            title: <ConnectorStatus currentStatus={conn.connectorStatus} />,
+            title: <ConnectorStatus currentStatus={conn.connectorStatus} />
           },
           {
-            title: <ConnectorTaskState connector={conn} />,
-          },
+            title: <ConnectorTaskState connector={conn} />
+          }
         ],
         connName: conn.name,
-        connStatus: conn.connectorStatus,
+        connStatus: conn.connectorStatus
       };
       const child = {
         parent: counter,
         cells: [
-          { title: <div>{""}</div> },
-          { title: <div>{""}</div> },
+          { title: <div>{''}</div> },
+          { title: <div>{''}</div> },
           {
             title: (
               <ConnectorOverview
-                i18nOverview={t("overview")}
-                i18nMessagePerSec={t("messagePerSec")}
-                i18nMaxLagInLastMin={t("maxLagInLastMin")}
-                i18nPercentiles={t("percentiles")}
+                i18nOverview={t('overview')}
+                i18nMessagePerSec={t('messagePerSec')}
+                i18nMaxLagInLastMin={t('maxLagInLastMin')}
+                i18nPercentiles={t('percentiles')}
               />
-            ),
+            )
           },
           {
             title: (
               <Flex>
-                <FlexItem style={{ width: "100%" }}>
-                  <Flex
-                    justifyContent={{ default: "justifyContentSpaceBetween" }}
-                  >
-                    <FlexItem flex={{ default: "flex_1" }}>
+                <FlexItem style={{ width: '100%' }}>
+                  <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+                    <FlexItem flex={{ default: 'flex_1' }}>
                       <Label className="no-bg">
                         <b data-testid="task-id">Task Id</b>
                       </Label>
                     </FlexItem>
-                    <FlexItem flex={{ default: "flex_2" }}>
+                    <FlexItem flex={{ default: 'flex_2' }}>
                       <Label className="no-bg">
                         <b data-testid="task-status">Status</b>
                       </Label>
                     </FlexItem>
-                    <FlexItem flex={{ default: "flex_1" }}>{""}</FlexItem>
+                    <FlexItem flex={{ default: 'flex_1' }}>{''}</FlexItem>
                   </Flex>
                   {getTaskStates(conn)}
                 </FlexItem>
               </Flex>
-            ),
-          },
-        ],
+            )
+          }
+        ]
       };
       rows.push(row);
       rows.push(child);
@@ -429,44 +410,41 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
 
   const tableActionResolver = (row: IRowData, extraData: IExtraData) => {
     let returnVal = [] as IAction[];
-    returnVal =  [      
+    returnVal = [
       {
         title: t('pause'),
         onClick: (event: any, rowId: any, rowData: any, extra: any) => {
           setCurrentActionAndName(Action.PAUSE, rowData.connName);
         },
-        isDisabled: row.connStatus === "RUNNING" ? false : true,
+        isDisabled: row.connStatus === 'RUNNING' ? false : true
       },
       {
         title: t('resume'),
         onClick: (event: any, rowId: any, rowData: any, extra: any) => {
           setCurrentActionAndName(Action.RESUME, rowData.connName);
         },
-        isDisabled: row.connStatus === "PAUSED" ? false : true,
+        isDisabled: row.connStatus === 'PAUSED' ? false : true
       },
       {
         title: t('restart'),
         onClick: (event: any, rowId: any, rowData: any, extra: any) => {
           setCurrentActionAndName(Action.RESTART, rowData.connName);
         },
-        isDisabled:
-          row.connStatus === "UNASSIGNED" || row.connStatus === "DESTROYED"
-            ? true
-            : false,
+        isDisabled: row.connStatus === 'UNASSIGNED' || row.connStatus === 'DESTROYED' ? true : false
       },
       {
-        isSeparator: true,
+        isSeparator: true
       },
       {
         title: t('delete'),
         onClick: (event: any, rowId: any, rowData: any, extra: any) => {
           setCurrentActionAndName(Action.DELETE, rowData.connName);
         },
-        isDisabled: false,
-      },
+        isDisabled: false
+      }
     ];
     return returnVal;
-  }
+  };
 
   const toggleRowOrder = () => {
     updateTableRows(connectors, !desRowOrder);
@@ -476,9 +454,9 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
   const onSortingSelect = (event?: SyntheticEvent<HTMLDivElement, Event> | undefined) => {
     const eventTarget = event?.target as HTMLElement;
     const sortBy = eventTarget.innerText;
-    setCurrentCategory(sortBy)
-    setIsSortingDropdownOpen(!isSortingDropdownOpen)
-    updateTableRows(connectors, desRowOrder, sortBy)
+    setCurrentCategory(sortBy);
+    setIsSortingDropdownOpen(!isSortingDropdownOpen);
+    updateTableRows(connectors, desRowOrder, sortBy);
   };
 
   const onSortingToggle = (isOpen: boolean) => {
@@ -488,55 +466,53 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
   const onCollapse = (event: any, rowKey: number, isOpen: any) => {
     tableRows[rowKey].isOpen = isOpen;
     let updatedExpandedRows = [...expandedRows];
-    updatedExpandedRows = isOpen
-      ? [...updatedExpandedRows, rowKey]
-      : updatedExpandedRows.filter((val) => val !== rowKey);
+    updatedExpandedRows = isOpen ? [...updatedExpandedRows, rowKey] : updatedExpandedRows.filter(val => val !== rowKey);
     setTableRows(tableRows);
     setExpandedRows(updatedExpandedRows);
   };
 
   const confirmationDialog = () => {
     const shouldShow = currentAction === Action.NONE ? false : true;
-    let confirmTitle = "";
-    let confirmButtonText = "";
-    let confirmMessageText = "";
+    let confirmTitle = '';
+    let confirmButtonText = '';
+    let confirmMessageText = '';
 
     switch (currentAction) {
       case Action.DELETE:
-        confirmTitle = t("deleteConnector");
-        confirmButtonText = t("delete");
-        confirmMessageText = t("deleteWarningMsg", {
-          connectorName: currentActionConnector,
+        confirmTitle = t('deleteConnector');
+        confirmButtonText = t('delete');
+        confirmMessageText = t('deleteWarningMsg', {
+          connectorName: currentActionConnector
         });
         break;
       case Action.PAUSE:
-        confirmTitle = t("pauseConnector");
-        confirmButtonText = t("pause");
-        confirmMessageText = t("connectorPauseWarningMsg", {
-          connectorName: currentActionConnector,
+        confirmTitle = t('pauseConnector');
+        confirmButtonText = t('pause');
+        confirmMessageText = t('connectorPauseWarningMsg', {
+          connectorName: currentActionConnector
         });
         break;
       case Action.RESUME:
-        confirmTitle = t("resumeConnector");
-        confirmButtonText = t("resume");
-        confirmMessageText = t("connectorResumeWarningMsg", {
-          connectorName: currentActionConnector,
+        confirmTitle = t('resumeConnector');
+        confirmButtonText = t('resume');
+        confirmMessageText = t('connectorResumeWarningMsg', {
+          connectorName: currentActionConnector
         });
         break;
       case Action.RESTART:
-        confirmTitle = t("restartConnector");
-        confirmButtonText = t("restart");
-        confirmMessageText = t("connectorRestartWarningMsg", {
-          connectorName: currentActionConnector,
+        confirmTitle = t('restartConnector');
+        confirmButtonText = t('restart');
+        confirmMessageText = t('connectorRestartWarningMsg', {
+          connectorName: currentActionConnector
         });
         break;
       case Action.RESTART_TASK:
         const [connName, connTaskId] = connectorTaskToRestart;
-        confirmTitle = t("restartConnectorTask");
-        confirmButtonText = t("restart");
-        confirmMessageText = t("connectorTaskRestartWarningMsg", {
+        confirmTitle = t('restartConnectorTask');
+        confirmButtonText = t('restart');
+        confirmMessageText = t('connectorTaskRestartWarningMsg', {
           connectorName: connName,
-          taskId: connTaskId,
+          taskId: connTaskId
         });
         break;
       default:
@@ -545,7 +521,7 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
     return (
       <ConfirmationDialog
         buttonStyle={ConfirmationButtonStyle.DANGER}
-        i18nCancelButtonText={t("cancel")}
+        i18nCancelButtonText={t('cancel')}
         i18nConfirmButtonText={confirmButtonText}
         i18nConfirmationMessage={confirmMessageText}
         i18nTitle={confirmTitle}
@@ -577,17 +553,9 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
         </ToolbarItem>
         <ToolbarItem>
           {desRowOrder ? (
-            <SortAmountDownIcon
-              className="connectors-page_toolbarSortIcon"
-              size="sm"
-              onClick={toggleRowOrder}
-            />
+            <SortAmountDownIcon className="connectors-page_toolbarSortIcon" size="sm" onClick={toggleRowOrder} />
           ) : (
-            <SortAmountDownAltIcon
-              className="connectors-page_toolbarSortIcon"
-              size="sm"
-              onClick={toggleRowOrder}
-            />
+            <SortAmountDownAltIcon className="connectors-page_toolbarSortIcon" size="sm" onClick={toggleRowOrder} />
           )}
         </ToolbarItem>
       </ToolbarContent>
@@ -599,11 +567,7 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
       loading={loading}
       loaderChildren={<PageLoader />}
       errorChildren={
-        <ApiError
-          i18nErrorTitle={props.i18nApiErrorTitle}
-          i18nErrorMsg={props.i18nApiErrorMsg}
-          error={errorMsg}
-        />
+        <ApiError i18nErrorTitle={props.i18nApiErrorTitle} i18nErrorMsg={props.i18nApiErrorMsg} error={errorMsg} />
       }
     >
       {() => (
@@ -611,19 +575,11 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
           {connectors.length > 0 ? (
             <>
               {confirmationDialog()}
-              <ToastAlertComponent
-                alerts={alerts}
-                removeAlert={removeAlert}
-                i18nDetails={t("details")}
-              />
+              <ToastAlertComponent alerts={alerts} removeAlert={removeAlert} i18nDetails={t('details')} />
               <Flex className="connectors-page_toolbarFlex flexCol pf-u-box-shadow-sm">
                 <FlexItem>
-                  {props.title ? (
-                    <Title headingLevel={"h1"}>{t("connectors")}</Title>
-                  ) : (
-                    ""
-                  )}
-                  <p>{t("connectorPageHeadingText")}</p>
+                  {props.title ? <Title headingLevel={'h1'}>{t('connectors')}</Title> : ''}
+                  <p>{t('connectorPageHeadingText')}</p>
                 </FlexItem>
               </Flex>
               <Flex className="connectors-page_toolbarFlex">
@@ -631,12 +587,8 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
                   <Toolbar>{toolbarItems}</Toolbar>
                 </FlexItem>
                 <FlexItem>
-                  <Button
-                    variant="primary"
-                    onClick={createConnector}
-                    className="connectors-page_toolbarCreateButton"
-                  >
-                    {t("createAConnector")}
+                  <Button variant="primary" onClick={createConnector} className="connectors-page_toolbarCreateButton">
+                    {t('createAConnector')}
                   </Button>
                 </FlexItem>
               </Flex>
@@ -656,17 +608,11 @@ export const ConnectorsTableComponent: React.FunctionComponent<IConnectorsTableC
             <EmptyState variant={EmptyStateVariant.large}>
               <EmptyStateIcon icon={CubesIcon} />
               <Title headingLevel="h4" size="lg">
-                {t("noConnectors")}
+                {t('noConnectors')}
               </Title>
-              <EmptyStateBody>
-                {t("connectorEmptyStateMsg")} 
-              </EmptyStateBody>
-              <Button
-                onClick={createConnector}
-                variant="primary"
-                className="connectors-page_createButton"
-              >
-                {t("createAConnector")}
+              <EmptyStateBody>{t('connectorEmptyStateMsg')}</EmptyStateBody>
+              <Button onClick={createConnector} variant="primary" className="connectors-page_createButton">
+                {t('createAConnector')}
               </Button>
             </EmptyState>
           )}
